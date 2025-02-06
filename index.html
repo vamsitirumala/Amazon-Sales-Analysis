@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazon Sales Analysis - Portfolio</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <h1>Amazon Sales Analysis</h1>
+        <p>Analyzing Sales Data to Drive Business Insights</p>
+    </header>
+
+    <section id="overview">
+        <h2>Project Overview</h2>
+        <p>
+            The goal of this project is to analyze Amazon sales data to derive actionable insights and provide recommendations to optimize sales strategies, enhance customer satisfaction, and improve overall business performance.
+        </p>
+    </section>
+
+    <section id="objectives">
+        <h2>Objectives</h2>
+        <ul>
+            <li>Understand overall sales performance, trends, and patterns over time.</li>
+            <li>Analyze product categories, sizes, and quantities sold to identify popular products.</li>
+            <li>Investigate fulfillment methods and their effectiveness in delivering orders.</li>
+            <li>Segment customers based on buying behavior, location, and other factors.</li>
+            <li>Explore geographical distribution of sales, focusing on states and cities.</li>
+            <li>Provide actionable recommendations to optimize sales strategies, inventory management, and customer service.</li>
+        </ul>
+    </section>
+
+    <section id="dataset">
+        <h2>Dataset Overview</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Column Name</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Order ID</td>
+                    <td>Unique identifier for each order</td>
+                </tr>
+                <tr>
+                    <td>Date</td>
+                    <td>Date of the order</td>
+                </tr>
+                <tr>
+                    <td>Delivery Status</td>
+                    <td>Status of order delivery</td>
+                </tr>
+                <tr>
+                    <td>Fulfilment</td>
+                    <td>Fulfillment method (e.g., Amazon, Seller)</td>
+                </tr>
+                <tr>
+                    <td>Sales Channel</td>
+                    <td>Channel through which the sale was made</td>
+                </tr>
+                <tr>
+                    <td>ship-service-level</td>
+                    <td>Shipping service level used</td>
+                </tr>
+                <tr>
+                    <td>Category</td>
+                    <td>Product category</td>
+                </tr>
+                <tr>
+                    <td>Size</td>
+                    <td>Product size</td>
+                </tr>
+                <tr>
+                    <td>Courier Status</td>
+                    <td>Status of the courier delivery</td>
+                </tr>
+                <tr>
+                    <td>Qty</td>
+                    <td>Quantity of products sold</td>
+                </tr>
+                <tr>
+                    <td>Amount</td>
+                    <td>Sales amount</td>
+                </tr>
+                <tr>
+                    <td>ship-city</td>
+                    <td>City to which the product was shipped</td>
+                </tr>
+                <tr>
+                    <td>ship-state</td>
+                    <td>State to which the product was shipped</td>
+                </tr>
+                <tr>
+                    <td>ship-postal-code</td>
+                    <td>Postal code of the shipping address</td>
+                </tr>
+                <tr>
+                    <td>B2B</td>
+                    <td>Whether the order was Business-to-Business</td>
+                </tr>
+                <tr>
+                    <td>fulfilled-by</td>
+                    <td>Fulfillment entity (e.g., Amazon or seller)</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section id="analysis">
+        <h2>Key Analysis Steps</h2>
+        <div class="process-step">
+            <h3>Sales Overview</h3>
+            <p>
+                Analyze overall sales trends by grouping data by time period (e.g., month/year) and visualizing trends using line charts.
+            </p>
+            <pre><code>
+df['Date'] = pd.to_datetime(df['Date'])
+sales_over_time = df.groupby(df['Date'].dt.to_period('M'))['Amount'].sum()
+sales_over_time.plot(kind='line', title='Monthly Sales Trends')
+            </code></pre>
+        </div>
+        <div class="process-step">
+            <h3>Product Analysis</h3>
+            <p>
+                Identify popular product categories, sizes, and high-quantity items by grouping data by `Category` and `Size`.
+            </p>
+            <pre><code>
+category_sales = df.groupby('Category')['Amount'].sum().sort_values(ascending=False)
+size_distribution = df['Size'].value_counts()
+category_sales.plot(kind='bar', title='Sales by Category')
+            </code></pre>
+        </div>
+        <div class="process-step">
+            <h3>Fulfillment Analysis</h3>
+            <p>
+                Evaluate the effectiveness of fulfillment methods by analyzing sales by fulfillment method (Amazon vs. Seller Fulfilled).
+            </p>
+            <pre><code>
+fulfillment_analysis = df.groupby('Fulfilment')['Amount'].sum()
+fulfillment_analysis.plot(kind='pie', autopct='%1.1f%%', title='Fulfillment Methods')
+            </code></pre>
+        </div>
+        <div class="process-step">
+            <h3>Customer Segmentation</h3>
+            <p>
+                Segment customers based on purchasing behavior by grouping data by customer location (`ship-city`, `ship-state`) and applying clustering algorithms (e.g., KMeans).
+            </p>
+            <pre><code>
+from sklearn.cluster import KMeans
+customer_data = df.groupby('ship-city').agg({'Amount': 'sum', 'Qty': 'sum'})
+kmeans = KMeans(n_clusters=3)
+customer_data['Segment'] = kmeans.fit_predict(customer_data)
+            </code></pre>
+        </div>
+        <div class="process-step">
+            <h3>Geographical Analysis</h3>
+            <p>
+                Explore sales distribution across states and cities by aggregating sales data by `ship-state` and creating visualizations (e.g., choropleth maps).
+            </p>
+            <pre><code>
+import plotly.express as px
+state_sales = df.groupby('ship-state')['Amount'].sum()
+fig = px.choropleth(state_sales.reset_index(),
+                    locations='ship-state',
+                    locationmode='USA-states',
+                    color='Amount',
+                    scope='usa')
+fig.show()
+            </code></pre>
+        </div>
+    </section>
+
+    <section id="tools-used">
+        <h2>Tools and Libraries Used</h2>
+        <div class="tool-logos">
+            <div class="tool">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/e/ed/Pandas_logo.svg" alt="Pandas Logo">
+                <p>Pandas</p>
+            </div>
+            <div class="tool">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/3/31/NumPy_logo_2020.svg" alt="NumPy Logo">
+                <p>NumPy</p>
+            </div>
+            <div class="tool">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/8/84/Matplotlib_icon.svg" alt="Matplotlib Logo">
+                <p>Matplotlib</p>
+            </div>
+            <div class="tool">
+                <img src="https://seaborn.pydata.org/_static/logo-wide-lightbg.svg" alt="Seaborn Logo">
+                <p>Seaborn</p>
+            </div>
+            <div class="tool">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/3/37/Plotly-logo-01-square.png" alt="Plotly Logo">
+                <p>Plotly</p>
+            </div>
+            <div class="tool">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Scikit_learn_logo_small.svg" alt="Scikit-Learn Logo">
+                <p>Scikit-Learn</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="conclusion">
+        <h2>Conclusion</h2>
+        <p>
+            This project provides a detailed analysis of Amazon sales data, focusing on trends, customer behavior, and fulfillment effectiveness. The insights derived aim to support data-driven decisions to improve sales strategies, customer satisfaction, and overall business efficiency.
+        </p>
+    </section>
+
+
+    <script src="script.js"></script>
+</body>
+</html>
